@@ -1,26 +1,87 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="../css/notePad-style.css">
-        <script src="../js/notePad-js.js"></script>
-    </head>
-    <body>
-        <header>
-            <section>
-                <label for="title">NotePad</label>
-                <input type="text" id="title" name="title" placeholder="添加事件" required="required" autocomplete="off" />
-            </section>
-        </header>
-    
-        <section>
-            <h2>正在进行 <span id="todocount"></span></h2>
-            <ol id="todolist" class="demo-box">
-            </ol>
-    
-            <h2>已经完成 <span id="donecount"></span></h2>
-            <ul id="donelist">
-            </ul>
-        </section>
-    </body>
-    
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>记事本</title>
+</head>
+<body>
+    <section>
+        <h3>记事本</h3>
+        <textarea id="data" cols="30" rows="10"></textarea>
+        <br><br>
+        <input type="button" value="保存" id="save">
+        <input type="button" value="读取" id="read">
+        <input type="button" value="修改" id="update">
+        <input type="button" value="删除" id="del">
+        <input type="hidden" value="" id="mykey">
+        <br><br>
+    </section>
+    <section id="dataList"></section>
+    <script>
+      let mykey = document.getElementById("mykey");
+        let data = document.getElementById("data");
+        let dataList = document.getElementById("dataList");
+        let radios = document.getElementsByName("texts");
+        // 保存
+        let save = document.getElementById("save");
+        save.onclick = mySave;
+        function mySave(){
+            if(data.value === "" || data.value === null){
+                alert("请输入内容");
+            }else{
+                let key = mykey.value;
+                if(key === "" || key === null){
+                    key = new Date().getTime();
+                }
+                localStorage.setItem(key,data.value);
+                data.value = "";
+                mykey.value = "";
+            }
+            myRead();
+        }
+        // 读取
+        let read = document.getElementById("read");
+        read.onclick = myRead;
+        function myRead(){
+            let table = "<table border='1px'><tr><th></th><th>key</th><th>value</th></tr>";
+            for(let i=0; i<localStorage.length; i++){
+                let key = localStorage.key(i);
+                let value = localStorage.getItem(key);
+                table += "<tr><td><input type='radio' name='texts' value='"+key+"'></td><td>"+key+"</td><td>"+value+"</td></tr>";
+            }
+            table += "</table>";
+            dataList.innerHTML = "";
+            dataList.innerHTML += table;
+        }
+        // 修改
+        let update = document.getElementById("update");
+        update.onclick = myUpdate;
+        function myUpdate(){
+            for(let i=0; i<radios.length; i++){
+                let radio = radios[i];
+                if(radio.checked){
+                    mykey.value = radio.value;
+                    break;
+                }
+            }
+            data.value = localStorage.getItem(mykey.value);
+        }
+        // 删除
+        let del = document.getElementById("del");
+        del.onclick = myDel;
+        function myDel(){
+            let key;
+            for(let i=0; i<radios.length; i++){
+                let radio = radios[i];
+                if(radio.checked){
+                    key = radio.value;
+                    break;
+                }
+            }
+            localStorage.removeItem(key);
+            myRead();
+        }
+         // localStorage.clear();
+    </script>
+</body>
 </html>
